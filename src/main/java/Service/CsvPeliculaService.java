@@ -1,6 +1,7 @@
 package Service;
 
 import Model.Pelicula;
+import lombok.Getter;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.Optional;
 import java.util.logging.Logger;
 
 public class CsvPeliculaService implements PeliculaService {
+    @Getter
     private List<Pelicula> peliculas;
     private String archivo;
     //variable para guardar el ultimo id, por defecto -1 (no hay nada)
@@ -35,13 +37,12 @@ public class CsvPeliculaService implements PeliculaService {
         var salida = new ArrayList<Pelicula>();
 
         logger.info("Iniciando lista de peliculas");
-        try(BufferedReader br = new BufferedReader(new FileReader(("AppGestorPeliculas/AppGestorPeliculas/src/main/java/resources/"+archivo)))){
+        try(BufferedReader br = new BufferedReader(new FileReader(("src/main/resources/"+archivo)))){
             String linea;
             while((linea = br.readLine()) != null){
-
+                Pelicula nuevaPelicula = new Pelicula();
                 String[] trozos = linea.split(",");
-                if(trozos.length==7){
-                    Pelicula nuevaPelicula = new Pelicula();
+                if(trozos.length>=8){
                     nuevaPelicula.setId(Integer.parseInt(trozos[0]));
                     nuevaPelicula.setTitulo(trozos[1]);
                     nuevaPelicula.setAño(Integer.parseInt(trozos[2]));
@@ -49,6 +50,9 @@ public class CsvPeliculaService implements PeliculaService {
                     nuevaPelicula.setDescripcion(trozos[4]);
                     nuevaPelicula.setGenero(trozos[5]);
                     nuevaPelicula.setImagen(trozos[6]);
+
+                    nuevaPelicula.setIdUsuario(Integer.parseInt(trozos[7]));
+
                     salida.add(nuevaPelicula);
                 }
             }
@@ -64,7 +68,7 @@ public class CsvPeliculaService implements PeliculaService {
     @Override
     public Optional<Pelicula> save(Pelicula pelicula){
         logger.info("Abriendo el archivo para escribir");
-        try(BufferedWriter bw = new BufferedWriter(new FileWriter("AppGestorPeliculas/AppGestorPeliculas/src/main/java/resources/"+archivo,true))){
+        try(BufferedWriter bw = new BufferedWriter(new FileWriter("src/main/resources/"+archivo,true))){
             usuarioId++;
             pelicula.setId(usuarioId);
             logger.info("Actualizando id: "+ usuarioId);
@@ -88,6 +92,8 @@ public class CsvPeliculaService implements PeliculaService {
         this.peliculas.add(nuevaPelicula);
         logger.info("Pelicula añadida a la lista: " + nuevaPelicula.getTitulo());
         // Después de añadir o eliminar, se debería llamar a saveAll(this.peliculas) para persistir el cambio.
+        //Se deberia añadir para que se añada en el csv tambien la pelicula:
+        // saveAll(this.peliculas)
     }
 
     //metodo para borrar un Pelicula de el arrayList de Pelicula a partir del titulo
@@ -104,7 +110,7 @@ public class CsvPeliculaService implements PeliculaService {
     public void saveAll(List<Pelicula> peliculas){
         logger.info("Guardando lista completa de peliculas al CSV");
         // El 'false' en FileWriter indica que sobrescribirá el archivo (no appending)
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter("AppGestorPeliculas/AppGestorPeliculas/src/main/java/resources/" + archivo, false))) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter("src/main/resources/" + archivo, false))) {
             for (Pelicula p : peliculas) {
                 bw.write(p.toString());
                 bw.newLine();

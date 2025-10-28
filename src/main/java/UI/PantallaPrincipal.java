@@ -1,0 +1,206 @@
+package UI;
+
+import Model.Pelicula;
+import Model.Usuario;
+import Service.ContextService;
+import Service.PeliculaService;
+import Service.UsuarioService;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
+
+public class PantallaPrincipal extends javax.swing.JFrame{
+    private JPanel panel1;
+    private JLabel Imagen;
+    private JLabel titulo;
+    private JLabel director;
+    private JLabel año;
+    private JPanel contenedorPeliculas;
+    private JPanel jPanelPelicula;
+    private PeliculaService peliculaservice;
+    private UsuarioService usuarioservice;
+    private ArrayList<Pelicula> peliculas=new ArrayList<>();
+
+    /* Es necesario que este accesible para poder modificarlo */
+    private JMenuItem menuItemAñadir;
+    public PantallaPrincipal(PeliculaService ps, UsuarioService us){
+        peliculaservice=ps;
+        usuarioservice=us;
+
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setTitle("Libreria de Peliculas");
+        this.setResizable(false);
+        this.setSize(800,800);
+        this.setLocationRelativeTo(null);
+        this.setContentPane(panel1);
+
+        /* Añadir menu de forma programática */
+        JMenuBar menuBar = PrepareMenuBar();
+        panel1.add(menuBar, BorderLayout.NORTH);
+
+        /* Configuración y carga de la tabla */
+
+        loadPeliculas();
+    }
+
+    //FALTA CAMBIAR PARA QUE LA CARGA DE PELICULAS DEPENDA DEL USUARIO REGISTRADO
+    private void loadPeliculas(){
+        // 1. Limpiar el contenedor actual antes de añadir nuevos elementos
+        contenedorPeliculas.removeAll();
+
+        // 2. Obtener TODAS las peliculas
+        ArrayList<Pelicula> todasPeliculas = (ArrayList<Pelicula>) peliculaservice.findAll();
+
+        // 3. Obtener el usuario activo del ContextService
+        ContextService.getInstance().getItem("usuarioActivo")
+                .ifPresent(userObject -> {
+                    // El Optional tiene un valor. Lo casteamos a Usuario.
+                    Usuario usuarioActivo = (Usuario) userObject;
+
+                    // 4. Filtrar la lista: Solo peliculas cuyo idUsuario coincida con el ID del usuario activo
+                    ArrayList<Pelicula> peliculasFiltradas = (ArrayList<Pelicula>) todasPeliculas.stream()
+                            .filter(p -> p.getIdUsuario() == usuarioActivo.getId())
+                            .collect(Collectors.toList());
+
+                    // 5. Cargar las películas filtradas en la UI
+                    cargarPeliculasEnUI(peliculasFiltradas); // Llama a tu método auxiliar para pintar en la UI
+                });
+
+        // 6. Repintar la UI
+        contenedorPeliculas.revalidate();
+        contenedorPeliculas.repaint();
+
+    }
+    private void cargarPeliculasEnUI(ArrayList<Pelicula> peliculasACargar) {
+        // Verificar si hay películas para evitar bucles innecesarios
+        if (peliculasACargar == null || peliculasACargar.isEmpty()) {
+            // Opcional: Mostrar un mensaje si no hay películas para el usuario
+            JLabel mensaje = new JLabel("No tienes películas añadidas.", SwingConstants.CENTER);
+            contenedorPeliculas.add(mensaje);
+            return; // Salir del método
+        }
+
+        // Iterar sobre cada película filtrada
+        for (Pelicula pelicula : peliculasACargar) {
+
+            // 1. Crear el componente visual reutilizable para la película actual.
+            // Se asume que este metodo auxiliar maneja la creación y configuración
+            // de etiquetas e imágenes para una sola Pelicula.
+            JPanel panelPelicula = crearPanelPelicula(pelicula);
+
+            // 2. Añadir el componente al contenedor principal (que debe ser FlowLayout).
+            contenedorPeliculas.add(panelPelicula);
+        }
+    }
+
+    private JPanel crearPanelPelicula(Pelicula pelicula){
+        //Se deben usar las variables imagen, titulo, etc para crear un nuevo panel
+
+        JPanel panel = new JPanel(new BorderLayout()); // Panel individual de la película
+        panel.setPreferredSize(new Dimension(200, 300)); // Establecer un tamaño fijo
+        panel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+
+        JLabel lblTitulo = new JLabel(pelicula.getTitulo(), SwingConstants.CENTER);
+        JLabel lblDirector = new JLabel(pelicula.getDirector());
+        JLabel lblAño = new JLabel(String.valueOf(pelicula.getAño()));
+
+        // Simulación de imagen (en la práctica se usaría ImageIcon)
+        JLabel lblImagen = new JLabel();
+        lblImagen.setHorizontalAlignment(SwingConstants.CENTER);
+
+        String imageUrlString = pelicula.getImagen();
+
+        // Definimos las dimensiones deseadas para la imagen en el panel
+        final int WIDTH = 180;
+        final int HEIGHT = 250;
+
+        if (imageUrlString != null && !imageUrlString.isEmpty()) {
+            try {
+                // 1. Crear un objeto URL a partir de la cadena HTTPS
+                java.net.URL imageUrl = new java.net.URL(imageUrlString);
+
+                // 2. Crear el ImageIcon. Swing descarga automáticamente la imagen.
+                ImageIcon originalIcon = new ImageIcon(imageUrl);
+
+                // Verificamos si la imagen se cargó correctamente (el ancho debe ser > 0)
+                if (originalIcon.getIconWidth() > 0) {
+                    // 3. Escalar la imagen para que encaje en el JLabel
+                    Image image = originalIcon.getImage();
+                    Image scaledImage = image.getScaledInstance(WIDTH, HEIGHT, Image.SCALE_SMOOTH);
+
+                    // 4. Asignar el icono escalado al JLabel
+                    lblImagen.setIcon(new ImageIcon(scaledImage));
+                    lblImagen.setText(null); // Borrar el texto
+                } else {
+                    lblImagen.setText("<html><center>ERROR: Imagen en URL vacía o no válida.</center></html>");
+                }
+            } catch (java.net.MalformedURLException e) {
+                // Error si la URL no tiene el formato correcto (ej. le falta "https://")
+                lblImagen.setText("<html><center>URL INVÁLIDA:<br>" + imageUrlString + "</center></html>");
+            } catch (Exception e) {
+                // Captura otros errores, como problemas de conexión o descarga
+                lblImagen.setText("<html><center>ERROR DE CONEXIÓN o DESCARGA.</center></html>");
+            }
+        } else {
+            lblImagen.setText("SIN RUTA DE IMAGEN");
+        }
+
+        JPanel infoPanel = new JPanel(new GridLayout(3, 1));
+        infoPanel.add(lblDirector);
+        infoPanel.add(lblAño);
+
+        panel.add(lblTitulo, BorderLayout.NORTH);
+        panel.add(lblImagen, BorderLayout.CENTER);
+        panel.add(infoPanel, BorderLayout.SOUTH);
+
+        return panel;
+    }
+
+    private JMenuBar PrepareMenuBar(){
+        JMenuBar menuBar = new JMenuBar();
+        JMenu jMenuInicio = new JMenu("Inicio");
+        JMenuItem menuItemLogin=new JMenuItem("Login");
+        // es un atributo de la clase, no hay que hacer nwe
+        menuItemAñadir = new JMenuItem("Añadir");
+        menuItemAñadir.setEnabled(false);
+        JMenuItem menuItemSalir = new JMenuItem("Salir");
+
+        menuBar.add(jMenuInicio);
+        jMenuInicio.add(menuItemLogin);
+        jMenuInicio.addSeparator();
+        jMenuInicio.add(menuItemAñadir);
+        jMenuInicio.addSeparator();
+        jMenuInicio.add(menuItemSalir);
+
+        /* Eventos del menú */
+        menuItemLogin.addActionListener(e -> {
+
+            (new Login(this, usuarioservice)).setVisible(true);
+
+            // Como es modal, se espera la ejecución hasta que se cierre
+
+            ContextService.getInstance().getItem("usuarioActivo").ifPresent( (_)->{
+                menuItemAñadir.setEnabled(true);
+                loadPeliculas();
+            });
+        });
+
+        menuItemSalir.addActionListener(e -> { System.exit(0); });
+
+        menuItemAñadir.addActionListener(e -> {
+            // Añadir nueva pelicula
+            //JOptionPane.showMessageDialog(this, "No implementado aún");
+            (new CreadorFormulario(peliculaservice)).setVisible(true);
+            //metodo para cargar las peliculas en el contenedorPeliculas
+            loadPeliculas();
+        });
+
+        return menuBar;
+    }
+    public void start(){
+        this.setVisible(true);
+    }
+
+}

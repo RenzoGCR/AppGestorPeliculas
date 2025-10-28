@@ -11,4 +11,10 @@ public class Pelicula {
     private String descripcion;
     private String genero;
     private String imagen;
+    private int idUsuario;
+
+    @Override
+    public String toString() {
+        return id +","+titulo+","+año+","+director+","+descripcion+","+genero+","+imagen+","+idUsuario;
+    }
 }

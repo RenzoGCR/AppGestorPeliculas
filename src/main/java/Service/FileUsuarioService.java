@@ -36,7 +36,7 @@ public class FileUsuarioService implements UsuarioService{
         var salida = new ArrayList<Usuario>();
         logger.info("Cargando usuarios desde el archivo: " + archivo);
         // La ruta se mantiene igual que en el código original
-        try (BufferedReader br = new BufferedReader(new FileReader("AppGestorPeliculas/AppGestorPeliculas/src/main/java/resources/"+archivo))){
+        try (BufferedReader br = new BufferedReader(new FileReader("src/main/resources/"+archivo))){
             String linea;
             while((linea = br.readLine()) != null){
                 String[] trozos = linea.split(",");
