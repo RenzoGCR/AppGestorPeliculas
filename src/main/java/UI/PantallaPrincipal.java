@@ -40,9 +40,12 @@ public class PantallaPrincipal extends javax.swing.JFrame{
         JMenuBar menuBar = PrepareMenuBar();
         panel1.add(menuBar, BorderLayout.NORTH);
 
-        /* Configuración y carga de la tabla */
+        /* ||TERMINAR|| Configuración y carga de peliculas
 
         loadPeliculas();
+
+        panel1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);*/
+
     }
 
     //FALTA CAMBIAR PARA QUE LA CARGA DE PELICULAS DEPENDA DEL USUARIO REGISTRADO
