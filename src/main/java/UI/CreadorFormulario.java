@@ -96,10 +96,12 @@ public class CreadorFormulario extends JDialog{
             JOptionPane.showMessageDialog(this, "Pelicula guardada correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
             dispose();
         }
-
+        /* Eliminado esta condicion para que no se guarde dos veces la pelicula en el csv.
         if(peliculaService.save(pelicula).isEmpty()){
             JOptionPane.showMessageDialog(this, "Error al guardar","",JOptionPane.WARNING_MESSAGE);
         } else dispose();
+
+         */
 
     }
 

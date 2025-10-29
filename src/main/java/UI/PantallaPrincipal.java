@@ -50,6 +50,9 @@ public class PantallaPrincipal extends javax.swing.JFrame{
         // 1. Limpiar el contenedor actual antes de añadir nuevos elementos
         contenedorPeliculas.removeAll();
 
+        //cambiar el layout a GridLayout con 2 columnas
+        contenedorPeliculas.setLayout(new GridLayout(0,2,10,10));
+
         // 2. Obtener TODAS las peliculas
         ArrayList<Pelicula> todasPeliculas = (ArrayList<Pelicula>) peliculaservice.findAll();
 
