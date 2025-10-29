@@ -29,7 +29,7 @@ public class Detalles extends JDialog{
 
         //nombre la ventana
         setTitle(pelicula.getTitulo());
-
+        labelTitulo.setText(pelicula.getTitulo());
         labelDescripcion.setText(pelicula.getDescripcion());
         labelAño.setText(String.valueOf((pelicula.getAño())));
         labelDirector.setText(pelicula.getDirector());

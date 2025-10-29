@@ -3,6 +3,7 @@ package UI;
 import Model.Pelicula;
 import Model.Usuario;
 import Service.ContextService;
+import Service.CsvPeliculaService;
 import Service.PeliculaService;
 import Service.UsuarioService;
 
@@ -27,6 +28,7 @@ public class PantallaPrincipal extends javax.swing.JFrame{
 
     /* Es necesario que este accesible para poder modificarlo */
     private JMenuItem menuItemAñadir;
+    private JMenuItem menuItemEliminar;
     public PantallaPrincipal(PeliculaService ps, UsuarioService us){
         peliculaservice=ps;
         usuarioservice=us;
@@ -192,15 +194,19 @@ public class PantallaPrincipal extends javax.swing.JFrame{
         JMenuBar menuBar = new JMenuBar();
         JMenu jMenuInicio = new JMenu("Inicio");
         JMenuItem menuItemLogin=new JMenuItem("Login");
-        // es un atributo de la clase, no hay que hacer nwe
+        // es un atributo de la clase, no hay que hacer new
         menuItemAñadir = new JMenuItem("Añadir");
         menuItemAñadir.setEnabled(false);
+        menuItemEliminar = new JMenuItem("Eliminar");
+        menuItemEliminar.setEnabled(false);
         JMenuItem menuItemSalir = new JMenuItem("Salir");
 
         menuBar.add(jMenuInicio);
         jMenuInicio.add(menuItemLogin);
         jMenuInicio.addSeparator();
         jMenuInicio.add(menuItemAñadir);
+        jMenuInicio.addSeparator();
+        jMenuInicio.add(menuItemEliminar);
         jMenuInicio.addSeparator();
         jMenuInicio.add(menuItemSalir);
 
@@ -213,6 +219,7 @@ public class PantallaPrincipal extends javax.swing.JFrame{
 
             ContextService.getInstance().getItem("usuarioActivo").ifPresent( (_)->{
                 menuItemAñadir.setEnabled(true);
+                menuItemEliminar.setEnabled(true);
                 loadPeliculas();
             });
         });
@@ -226,6 +233,48 @@ public class PantallaPrincipal extends javax.swing.JFrame{
             //metodo para cargar las peliculas en el contenedorPeliculas
             loadPeliculas();
         });
+        menuItemEliminar.addActionListener(e -> {
+            //elimino la pelicula buscandola por el titulo y luego recargo el csv.
+            //1. Solicitar el nombre de la pelicula a eliminar
+            String tituloAEliminar = JOptionPane.showInputDialog(this,"Introduce el titulo de la pelicula a eliminar",
+                    "Eliminar Pelicula",JOptionPane.QUESTION_MESSAGE
+            );
+            //2. Procesar la eliminación solo si el usuario ingresó un título
+            if (tituloAEliminar != null && !tituloAEliminar.trim().isEmpty()) {
+
+                // 3. Llamar al metodo del servicio para eliminar de la lista en memoria
+                try {
+                    peliculaservice.deletePelicula(tituloAEliminar.trim());
+
+                    // 4. Persistir la lista completa después de la eliminación
+                    // (Se asume que peliculasService es una instancia de CsvPeliculaService
+                    // y que tiene el metodo getPeliculas()).
+                    ((CsvPeliculaService)peliculaservice).saveAll(((CsvPeliculaService)peliculaservice).getPeliculas());
+
+                    // 5. Notificar éxito (Opcional, pero útil)
+                    JOptionPane.showMessageDialog(this,
+                            "Película '" + tituloAEliminar.trim() + "' eliminada y guardada.",
+                            "Eliminación Exitosa",
+                            JOptionPane.INFORMATION_MESSAGE);
+
+                    // 6. Recargar la interfaz de usuario para mostrar los cambios
+                    loadPeliculas();
+
+                } catch (Exception ex) {
+                    // Manejar errores (ej. si el archivo no se pudo escribir)
+                    JOptionPane.showMessageDialog(this,
+                            "Error al guardar los cambios: " + ex.getMessage(),
+                            "Error de Persistencia",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+
+            } else if (tituloAEliminar != null) {
+                // Mensaje si el usuario presiona OK pero deja el campo vacío
+                JOptionPane.showMessageDialog(this, "El título no puede estar vacío.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            }
+        });
+
+
 
         return menuBar;
     }
