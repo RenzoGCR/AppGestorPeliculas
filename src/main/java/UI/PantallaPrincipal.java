@@ -11,6 +11,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
@@ -44,9 +45,17 @@ public class PantallaPrincipal extends javax.swing.JFrame{
         JMenuBar menuBar = PrepareMenuBar();
         panel1.add(menuBar, BorderLayout.NORTH);
 
-        /* ||TERMINAR|| Configuración y carga de peliculas*/
+
+        //Añadido de la imagen de la aplicacion al iniciarla
+        String rutaImagen = "iconoNetflix.png";
+        URL urlImagen = getClass().getClassLoader().getResource(rutaImagen);
+        Image icono = new ImageIcon(urlImagen).getImage();
+        this.setIconImage(icono);
+
 
         loadPeliculas();
+
+
 
         //panel1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
@@ -229,7 +238,7 @@ public class PantallaPrincipal extends javax.swing.JFrame{
         menuItemAñadir.addActionListener(e -> {
             // Añadir nueva pelicula
             //JOptionPane.showMessageDialog(this, "No implementado aún");
-            (new CreadorFormulario(peliculaservice)).setVisible(true);
+            (new CreadorFormulario(this,peliculaservice)).setVisible(true);
             //metodo para cargar las peliculas en el contenedorPeliculas
             loadPeliculas();
         });
@@ -273,9 +282,6 @@ public class PantallaPrincipal extends javax.swing.JFrame{
                 JOptionPane.showMessageDialog(this, "El título no puede estar vacío.", "Advertencia", JOptionPane.WARNING_MESSAGE);
             }
         });
-
-
-
         return menuBar;
     }
     public void start(){

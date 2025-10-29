@@ -21,7 +21,7 @@ public class CreadorFormulario extends JDialog{
     private JTextField tfGenero;
     private PeliculaService peliculaService;
 
-    public CreadorFormulario(PeliculaService ps) {
+    public CreadorFormulario(JFrame owner,PeliculaService ps) {
         peliculaService = ps;
 
         setContentPane(contentPanel);
@@ -35,6 +35,9 @@ public class CreadorFormulario extends JDialog{
             public void actionPerformed(ActionEvent e) {
                 onOK();
             }
+        });
+        buttonCancel.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {onCancel();}
         });
 
         // call onCancel() when cross is clicked
@@ -53,6 +56,7 @@ public class CreadorFormulario extends JDialog{
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
         pack();
+        this.setLocationRelativeTo(owner);
     }
 
     private void onOK() {

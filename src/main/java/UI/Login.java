@@ -29,6 +29,7 @@ public class Login extends JDialog{
         setResizable(false);
         getRootPane().setDefaultButton(buttonOk);
         pack();
+        this.setLocationRelativeTo(parent);
 
         buttonOk.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
