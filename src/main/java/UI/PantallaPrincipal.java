@@ -8,6 +8,8 @@ import Service.UsuarioService;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
@@ -40,11 +42,11 @@ public class PantallaPrincipal extends javax.swing.JFrame{
         JMenuBar menuBar = PrepareMenuBar();
         panel1.add(menuBar, BorderLayout.NORTH);
 
-        /* ||TERMINAR|| Configuración y carga de peliculas
+        /* ||TERMINAR|| Configuración y carga de peliculas*/
 
         loadPeliculas();
 
-        panel1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);*/
+        //panel1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
     }
 
@@ -71,7 +73,7 @@ public class PantallaPrincipal extends javax.swing.JFrame{
                             .collect(Collectors.toList());
 
                     // 5. Cargar las películas filtradas en la UI
-                    cargarPeliculasEnUI(peliculasFiltradas); // Llama a tu método auxiliar para pintar en la UI
+                    cargarPeliculasEnUI(peliculasFiltradas); // Llama a tu metodo auxiliar para pintar en la UI
                 });
 
         // 6. Repintar la UI
@@ -85,7 +87,7 @@ public class PantallaPrincipal extends javax.swing.JFrame{
             // Opcional: Mostrar un mensaje si no hay películas para el usuario
             JLabel mensaje = new JLabel("No tienes películas añadidas.", SwingConstants.CENTER);
             contenedorPeliculas.add(mensaje);
-            return; // Salir del método
+            return; // Salir del metodo
         }
 
         // Iterar sobre cada película filtrada
@@ -96,9 +98,31 @@ public class PantallaPrincipal extends javax.swing.JFrame{
             // de etiquetas e imágenes para una sola Pelicula.
             JPanel panelPelicula = crearPanelPelicula(pelicula);
 
-            // 2. Añadir el componente al contenedor principal (que debe ser FlowLayout).
+            // 2. Adjuntar el Listener de Clic al panel.
+            addClickListenerToPanel(panelPelicula, pelicula); // Llama al nuevo metodo
+
+            // 3. Añadir el componente al contenedor principal (que debe ser FlowLayout).
             contenedorPeliculas.add(panelPelicula);
         }
+    }
+
+    private void addClickListenerToPanel(JPanel panel, Pelicula pelicula){
+        // Configura el panel para que cambie de color al pasar el mouse (opcional)
+        panel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        panel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Lógica similar a table1.getSelectionModel().addListSelectionListener:
+
+                // 1. Guardar el objeto Pelicula seleccionado en el ContextService.
+                ContextService.getInstance().addItem("peliculaSeleccionada", pelicula);
+
+                // 2. Mostrar la ventana de detalles (JDialog).
+                // Asumiendo que 'Detalles' recibe la referencia de 'PantallaPrincipal' (this) como su Frame padre
+                // y que el constructor ya sabe cómo obtener 'peliculaSeleccionada' del ContextService.
+                (new Detalles(PantallaPrincipal.this)).setVisible(true);
+            }
+        });
     }
 
     private JPanel crearPanelPelicula(Pelicula pelicula){
