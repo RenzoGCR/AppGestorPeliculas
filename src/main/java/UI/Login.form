@@ -3,7 +3,7 @@
   <grid id="27dc6" binding="contentPane" layout-manager="GridLayoutManager" row-count="3" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="10" left="10" bottom="10" right="10"/>
     <constraints>
-      <xy x="20" y="20" width="500" height="400"/>
+      <xy x="20" y="20" width="500" height="415"/>
     </constraints>
     <properties/>
     <border type="none"/>
@@ -92,7 +92,8 @@
         </constraints>
         <properties>
           <horizontalAlignment value="2"/>
-          <text value="Login"/>
+          <icon value="rsz_smallicononetflix.png"/>
+          <text value="Gestor de Películas"/>
         </properties>
       </component>
     </children>

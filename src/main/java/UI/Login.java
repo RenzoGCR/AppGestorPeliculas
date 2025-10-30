@@ -8,7 +8,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class Login extends JDialog{
+public class Login extends JDialog {
     private JPanel contentPane;
     private JButton buttonOk;
     private JButton buttonCancel;
@@ -17,7 +17,8 @@ public class Login extends JDialog{
 
     UsuarioService usuarioService;
     JFrame parent;
-    public Login(JFrame parent, UsuarioService us){
+
+    public Login(JFrame parent, UsuarioService us) {
         // para poder usar makeLogin
         this.parent = parent;
 
@@ -63,7 +64,7 @@ public class Login extends JDialog{
         usuarioService.validate(txtUser.getText(), txtPassword.getText()).ifPresentOrElse(
                 (Usuario user) -> {
                     //AppContext.usuarioActivo = user;
-                    ContextService.getInstance().addItem("usuarioActivo",user);
+                    ContextService.getInstance().addItem("usuarioActivo", user);
                     dispose();
                 },
                 () -> {

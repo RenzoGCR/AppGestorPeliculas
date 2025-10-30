@@ -4,11 +4,13 @@ import Model.Pelicula;
 import Service.ContextService;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.net.URL;
 
-public class Detalles extends JDialog{
+public class Detalles extends JDialog {
     private JPanel contentPanel;
     private JButton volverButton;
     private JLabel imagen;
@@ -17,7 +19,7 @@ public class Detalles extends JDialog{
     private JLabel labelAño;
     private JLabel labelDescripcion;
 
-    public Detalles(JFrame parent){
+    public Detalles(JFrame parent) {
         setContentPane(contentPanel);
         setModal(true);
         getRootPane().setDefaultButton(volverButton);
@@ -49,6 +51,11 @@ public class Detalles extends JDialog{
 
         pack();
 
+        //Añadido de la imagen de la aplicacion al iniciarla
+        String rutaImagen = "iconoNetflix.png";
+        URL urlImagen = getClass().getClassLoader().getResource(rutaImagen);
+        Image icono = new ImageIcon(urlImagen).getImage();
+        this.setIconImage(icono);
     }
     private void onOK() {
         dispose();

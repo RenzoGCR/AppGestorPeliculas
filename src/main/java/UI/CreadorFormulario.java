@@ -9,7 +9,7 @@ import Service.PeliculaService;
 import javax.swing.*;
 import java.awt.event.*;
 
-public class CreadorFormulario extends JDialog{
+public class CreadorFormulario extends JDialog {
     private JButton buttonOK;
     private JButton buttonCancel;
     private JTextField tfTitulo;
@@ -21,7 +21,7 @@ public class CreadorFormulario extends JDialog{
     private JTextField tfGenero;
     private PeliculaService peliculaService;
 
-    public CreadorFormulario(JFrame owner,PeliculaService ps) {
+    public CreadorFormulario(JFrame owner, PeliculaService ps) {
         peliculaService = ps;
 
         setContentPane(contentPanel);
@@ -37,7 +37,9 @@ public class CreadorFormulario extends JDialog{
             }
         });
         buttonCancel.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {onCancel();}
+            public void actionPerformed(ActionEvent e) {
+                onCancel();
+            }
         });
 
         // call onCancel() when cross is clicked
@@ -63,9 +65,9 @@ public class CreadorFormulario extends JDialog{
 
         Pelicula pelicula = new Pelicula();
 
-        pelicula.setTitulo( tfTitulo.getText());
+        pelicula.setTitulo(tfTitulo.getText());
         pelicula.setAño((Integer) spinnerAño.getValue());
-        pelicula.setDirector( tfDirector.getText() );
+        pelicula.setDirector(tfDirector.getText());
         pelicula.setDescripcion(taDescripcion.getText());
         pelicula.setImagen(tfRutaArchivo.getText());
         pelicula.setGenero(tfGenero.getText());
@@ -84,29 +86,14 @@ public class CreadorFormulario extends JDialog{
                 );
         // Si el idUsuario se ha asignado (solo si el Optional no estaba vacío)
         if (pelicula.getIdUsuario() != 0) {
-            /* LOGICA ANTIGUA, PROBLEMA: GUARDA 2 VECES EN ARCHIVO
-            if(peliculaService.save(pelicula).isEmpty()){
-                JOptionPane.showMessageDialog(this, "Error al guardar","Error",JOptionPane.WARNING_MESSAGE);
-            } else {
-                dispose();
-            }
-
-             */
             // 1. Añade a la lista en memoria (esto asigna el ID y añade al List<Pelicula> interno)
             peliculaService.addPelicula(pelicula);
             // 2. Persiste la lista completa, sobrescribiendo el CSV
-            peliculaService.saveAll(((CsvPeliculaService)peliculaService).getPeliculas());
+            peliculaService.saveAll(((CsvPeliculaService) peliculaService).getPeliculas());
             // 3. Ya no necesitas el Optional, solo verificar si se guardó
             JOptionPane.showMessageDialog(this, "Pelicula guardada correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
             dispose();
         }
-        /* Eliminado esta condicion para que no se guarde dos veces la pelicula en el csv.
-        if(peliculaService.save(pelicula).isEmpty()){
-            JOptionPane.showMessageDialog(this, "Error al guardar","",JOptionPane.WARNING_MESSAGE);
-        } else dispose();
-
-         */
-
     }
 
     private void onCancel() {

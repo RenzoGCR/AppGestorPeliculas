@@ -15,7 +15,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
-public class PantallaPrincipal extends javax.swing.JFrame{
+public class PantallaPrincipal extends javax.swing.JFrame {
     private JPanel panel1;
     private JLabel Imagen;
     private JLabel titulo;
@@ -25,19 +25,20 @@ public class PantallaPrincipal extends javax.swing.JFrame{
     private JPanel jPanelPelicula;
     private PeliculaService peliculaservice;
     private UsuarioService usuarioservice;
-    private ArrayList<Pelicula> peliculas=new ArrayList<>();
+    private ArrayList<Pelicula> peliculas = new ArrayList<>();
 
     /* Es necesario que este accesible para poder modificarlo */
     private JMenuItem menuItemAñadir;
     private JMenuItem menuItemEliminar;
-    public PantallaPrincipal(PeliculaService ps, UsuarioService us){
-        peliculaservice=ps;
-        usuarioservice=us;
+
+    public PantallaPrincipal(PeliculaService ps, UsuarioService us) {
+        peliculaservice = ps;
+        usuarioservice = us;
 
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setTitle("Libreria de Peliculas");
         this.setResizable(false);
-        this.setSize(800,800);
+        this.setSize(800, 800);
         this.setLocationRelativeTo(null);
         this.setContentPane(panel1);
 
@@ -52,22 +53,15 @@ public class PantallaPrincipal extends javax.swing.JFrame{
         Image icono = new ImageIcon(urlImagen).getImage();
         this.setIconImage(icono);
 
-
         loadPeliculas();
-
-
-
-        //panel1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
     }
 
-    //FALTA CAMBIAR PARA QUE LA CARGA DE PELICULAS DEPENDA DEL USUARIO REGISTRADO
-    private void loadPeliculas(){
+    private void loadPeliculas() {
         // 1. Limpiar el contenedor actual antes de añadir nuevos elementos
         contenedorPeliculas.removeAll();
 
         //cambiar el layout a GridLayout con 2 columnas
-        contenedorPeliculas.setLayout(new GridLayout(0,2,10,10));
+        contenedorPeliculas.setLayout(new GridLayout(0, 2, 10, 10));
 
         // 2. Obtener TODAS las peliculas
         ArrayList<Pelicula> todasPeliculas = (ArrayList<Pelicula>) peliculaservice.findAll();
@@ -86,12 +80,11 @@ public class PantallaPrincipal extends javax.swing.JFrame{
                     // 5. Cargar las películas filtradas en la UI
                     cargarPeliculasEnUI(peliculasFiltradas); // Llama a tu metodo auxiliar para pintar en la UI
                 });
-
         // 6. Repintar la UI
         contenedorPeliculas.revalidate();
         contenedorPeliculas.repaint();
-
     }
+
     private void cargarPeliculasEnUI(ArrayList<Pelicula> peliculasACargar) {
         // Verificar si hay películas para evitar bucles innecesarios
         if (peliculasACargar == null || peliculasACargar.isEmpty()) {
@@ -117,7 +110,7 @@ public class PantallaPrincipal extends javax.swing.JFrame{
         }
     }
 
-    private void addClickListenerToPanel(JPanel panel, Pelicula pelicula){
+    private void addClickListenerToPanel(JPanel panel, Pelicula pelicula) {
         // Configura el panel para que cambie de color al pasar el mouse (opcional)
         panel.setCursor(new Cursor(Cursor.HAND_CURSOR));
         panel.addMouseListener(new MouseAdapter() {
@@ -136,7 +129,7 @@ public class PantallaPrincipal extends javax.swing.JFrame{
         });
     }
 
-    private JPanel crearPanelPelicula(Pelicula pelicula){
+    private JPanel crearPanelPelicula(Pelicula pelicula) {
         //Se deben usar las variables imagen, titulo, etc para crear un nuevo panel
 
         JPanel panel = new JPanel(new BorderLayout()); // Panel individual de la película
@@ -164,17 +157,21 @@ public class PantallaPrincipal extends javax.swing.JFrame{
 
                 // 2. Crear el ImageIcon. Swing descarga automáticamente la imagen.
                 ImageIcon originalIcon = new ImageIcon(imageUrl);
+                Image image = originalIcon.getImage();
+
+                int ancho = image.getWidth(lblImagen);
 
                 // Verificamos si la imagen se cargó correctamente (el ancho debe ser > 0)
-                if (originalIcon.getIconWidth() > 0) {
+                if (ancho > 0) {
+
                     // 3. Escalar la imagen para que encaje en el JLabel
-                    Image image = originalIcon.getImage();
                     Image scaledImage = image.getScaledInstance(WIDTH, HEIGHT, Image.SCALE_SMOOTH);
 
                     // 4. Asignar el icono escalado al JLabel
                     lblImagen.setIcon(new ImageIcon(scaledImage));
                     lblImagen.setText(null); // Borrar el texto
                 } else {
+                    // Si el ancho es <= 0 (falla al descargar o imagen no válida)
                     lblImagen.setText("<html><center>ERROR: Imagen en URL vacía o no válida.</center></html>");
                 }
             } catch (java.net.MalformedURLException e) {
@@ -199,10 +196,10 @@ public class PantallaPrincipal extends javax.swing.JFrame{
         return panel;
     }
 
-    private JMenuBar PrepareMenuBar(){
+    private JMenuBar PrepareMenuBar() {
         JMenuBar menuBar = new JMenuBar();
         JMenu jMenuInicio = new JMenu("Inicio");
-        JMenuItem menuItemLogin=new JMenuItem("Login");
+        JMenuItem menuItemLogin = new JMenuItem("Login");
         // es un atributo de la clase, no hay que hacer new
         menuItemAñadir = new JMenuItem("Añadir");
         menuItemAñadir.setEnabled(false);
@@ -226,27 +223,29 @@ public class PantallaPrincipal extends javax.swing.JFrame{
 
             // Como es modal, se espera la ejecución hasta que se cierre
 
-            ContextService.getInstance().getItem("usuarioActivo").ifPresent( (_)->{
+            ContextService.getInstance().getItem("usuarioActivo").ifPresent((_) -> {
                 menuItemAñadir.setEnabled(true);
                 menuItemEliminar.setEnabled(true);
                 loadPeliculas();
             });
         });
 
-        menuItemSalir.addActionListener(e -> { System.exit(0); });
+        menuItemSalir.addActionListener(e -> {
+            System.exit(0);
+        });
 
         menuItemAñadir.addActionListener(e -> {
             // Añadir nueva pelicula
-            //JOptionPane.showMessageDialog(this, "No implementado aún");
-            (new CreadorFormulario(this,peliculaservice)).setVisible(true);
+
+            (new CreadorFormulario(this, peliculaservice)).setVisible(true);
             //metodo para cargar las peliculas en el contenedorPeliculas
             loadPeliculas();
         });
         menuItemEliminar.addActionListener(e -> {
             //elimino la pelicula buscandola por el titulo y luego recargo el csv.
             //1. Solicitar el nombre de la pelicula a eliminar
-            String tituloAEliminar = JOptionPane.showInputDialog(this,"Introduce el titulo de la pelicula a eliminar",
-                    "Eliminar Pelicula",JOptionPane.QUESTION_MESSAGE
+            String tituloAEliminar = JOptionPane.showInputDialog(this, "Introduce el titulo de la pelicula a eliminar",
+                    "Eliminar Pelicula", JOptionPane.QUESTION_MESSAGE
             );
             //2. Procesar la eliminación solo si el usuario ingresó un título
             if (tituloAEliminar != null && !tituloAEliminar.trim().isEmpty()) {
@@ -258,7 +257,7 @@ public class PantallaPrincipal extends javax.swing.JFrame{
                     // 4. Persistir la lista completa después de la eliminación
                     // (Se asume que peliculasService es una instancia de CsvPeliculaService
                     // y que tiene el metodo getPeliculas()).
-                    ((CsvPeliculaService)peliculaservice).saveAll(((CsvPeliculaService)peliculaservice).getPeliculas());
+                    ((CsvPeliculaService) peliculaservice).saveAll(((CsvPeliculaService) peliculaservice).getPeliculas());
 
                     // 5. Notificar éxito (Opcional, pero útil)
                     JOptionPane.showMessageDialog(this,
@@ -284,7 +283,8 @@ public class PantallaPrincipal extends javax.swing.JFrame{
         });
         return menuBar;
     }
-    public void start(){
+
+    public void start() {
         this.setVisible(true);
     }
 
